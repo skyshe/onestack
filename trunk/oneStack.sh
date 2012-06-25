@@ -332,16 +332,16 @@ service glance-api restart && service glance-registry restart
 ## 下载镜像
 ## http://cloud-images.ubuntu.com/precise/current/
 ## 这应该是ubuntu提供的最新的稳定的镜像。
-#wget http://cloud-images.ubuntu.com/precise/current/precise-server-cloudimg-amd64-disk1.img
-expect -c "spawn /usr/bin/scp  yuan@192.168.139.84:/home/yuan/precise-server-cloudimg-amd64-disk1.img .; expect {
-   \"password:\"; {
-  send \"yyhu\r\n\";
-  }; \"Are you sure you want to continue connecting (yes/no)?\" {
-  send \"yes\r\n\" ;
-  expect \"password:\";
-  send \"yyhu\r\n\";
-  }
-} ; set timeout -1; expect -re \"100%\";"
+wget http://cloud-images.ubuntu.com/precise/current/precise-server-cloudimg-amd64-disk1.img
+##  expect -c "spawn /usr/bin/scp  yuan@192.168.139.84:/home/yuan/precise-server-cloudimg-amd64-disk1.img .; expect {
+##     \"password:\"; {
+##    send \"yyhu\r\n\";
+##    }; \"Are you sure you want to continue connecting (yes/no)?\" {
+##    send \"yes\r\n\" ;
+##    expect \"password:\";
+##    send \"yyhu\r\n\";
+##    }
+##  } ; set timeout -1; expect -re \"100%\";"
 ##^^####sleep 5; expect -re \"password\"; send \"yyhu\r\n\";
 glance add name="Ubuntu12.04-amd64" is_public=true container_format=ovf disk_format=qcow2 < precise-server-cloudimg-amd64-disk1.img
 ## 这里还有一种方法上传，如果你没用环境变量。

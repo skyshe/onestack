@@ -7,7 +7,7 @@ Only checkout and run it!
 svn checkout http://onestack.googlecode.com/svn/trunk/ onestack-read-only
 
 3. run it.
-cd onestack && ./oneStack.sh
+cd onestack-read-only/ && ./oneStack.sh
 
 ## 2. delete OpenStack
 ./delStack.sh
