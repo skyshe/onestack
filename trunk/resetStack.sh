@@ -1,7 +1,13 @@
 #!/usr/bin/env bash
+# *./resetStack.sh clear* clear the database.
+# *./resetStack.sh * reset the database and create a instance.
+
+# Hily.Hoo@gmail.com (Kayven)
+# Learn more and get the most recent version at http://code.google.com/p/onestack/
 set -o xtrace
 
 if [ $1 ] && [ $1 = "clear" ]; then
+	nova delete `nova list | awk 'FNR==4{print $4}'`
 	MYSQL_PASSWD=${MYSQL_PASSWD:-"cloud1234"}
 	NOVA_DB_USERNAME=${NOVA_DB_USERNAME:-"novadbadmin"}
 	NOVA_DB_PASSWD=${NOVA_DB_PASSWD:-"cloud1234"}
@@ -10,7 +16,6 @@ if [ $1 ] && [ $1 = "clear" ]; then
 	mysql -uroot -p$MYSQL_PASSWD -e "DROP DATABASE IF EXISTS nova;"
 	mysql -uroot -p$MYSQL_PASSWD -e "CREATE DATABASE nova;"
 	mysql -uroot -p$MYSQL_PASSWD -e "GRANT ALL ON nova.* TO '$NOVA_DB_USERNAME'@'%' IDENTIFIED BY '$NOVA_DB_PASSWD';"
-	##for a in libvirt-bin nova-network nova-compute nova-api nova-objectstore nova-scheduler novnc nova-volume nova-consoleauth; do service "$a" restart; done
 	reboot
 else
 	# 5：同步数据库
@@ -29,8 +34,7 @@ else
 	chown -R nova:nova /etc/nova
 	## 再重启相关服务
 	for a in libvirt-bin nova-network nova-compute nova-api nova-objectstore nova-scheduler novnc nova-volume nova-consoleauth; do service "$a" restart; done
-	sleep 30
-	 
+	sleep 10
 	## 6：检查nova服务
 	## 一路回车，就可以了。通过expect可以不用输入。
 	if [ ! -e ~/.ssh/id_rsa ]; then
@@ -39,7 +43,6 @@ else
 	## 2：上传密钥到数据库
 	nova keypair-add --pub_key ~/.ssh/id_rsa.pub key1
 	## nova keypair-list
-	
 	
 	## 打开防火墙
 	nova secgroup-add-rule default tcp 1 65535 0.0.0.0/0

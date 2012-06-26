@@ -1,4 +1,12 @@
 #!/usr/bin/env bash
+# **oneStack.sh** is a tool to deploy complete and real OpenStack cloud computing service.
+
+# This script installs and configures various combinations of *Glance*,
+# *Horizon*, *Keystone*, *Nova*, *Mysql* and others.
+
+# Hily.Hoo@gmail.com (Kayven)
+# Learn more and get the most recent version at http://code.google.com/p/onestack/
+
 set -o xtrace
 ## 请使用root执行本脚本！
 ## Ubuntu 12.04 ("Precise") 部署 OpenStack Essex
@@ -20,6 +28,8 @@ if [ `whoami` != "root" ]; then
 	exec su -c 'sh ./oneStack.sh'
 fi
 
+##########################################################################
+## 如果原来安装过OpenStack，请先执行 ./delStack.sh
 ##########################################################################
 ## 配置参数
 MYSQL_PASSWD=${MYSQL_PASSWD:-"cloud1234"}
@@ -165,6 +175,11 @@ apt-get install --no-install-recommends -y mysql-server python-mysqldb
 ## 让mysql支持外部访问
 sed -i '/^bind-address/s/127.0.0.1/0.0.0.0/g' /etc/mysql/my.cnf  
 service mysql restart
+if [ ! -s /etc/apache2/httpd.conf ]; then
+        echo "ServerName localhost" >> /etc/apache2/httpd.conf
+        /etc/init.d/apache2 restart
+fi
+
 ## 2：安装phpmyadmin （可选）
 cat <<PHPmyadmin | debconf-set-selections
 phpmyadmin phpmyadmin/reconfigure-webserver  text     apache2
@@ -195,15 +210,6 @@ mysql -uroot -p$MYSQL_PASSWD -e "CREATE DATABASE glance;"
 mysql -uroot -p$MYSQL_PASSWD -e "GRANT ALL ON glance.* TO '$GLANCE_DB_USERNAME'@'%' IDENTIFIED BY '$GLANCE_DB_PASSWD';"
 if [ -e /var/lib/keystone/keystone.db ]; then
 rm -rf /var/lib/keystone/keystone.db
-fi
-if [ -e /etc/nova/api-paste.ini ]; then
-rm -rf /etc/nova/api-paste.ini
-fi
-if [ -e /etc/glance/glance-api-paste.ini ]; then
-rm -rf /etc/glance/glance-api-paste.ini
-fi
-if [ -e /etc/glance/glance-registry-paste.ini ]; then
-rm -rf /etc/glance/glance-registry-paste.ini
 fi
 
 ## 三：安装和配置keystone
@@ -343,7 +349,9 @@ wget http://cloud-images.ubuntu.com/precise/current/precise-server-cloudimg-amd6
 ##    }
 ##  } ; set timeout -1; expect -re \"100%\";"
 ##^^####sleep 5; expect -re \"password\"; send \"yyhu\r\n\";
-glance add name="Ubuntu12.04-amd64" is_public=true container_format=ovf disk_format=qcow2 < precise-server-cloudimg-amd64-disk1.img
+
+
+# glance add name="Ubuntu12.04-amd64" is_public=true container_format=ovf disk_format=qcow2 < precise-server-cloudimg-amd64-disk1.img
 ## 这里还有一种方法上传，如果你没用环境变量。
 ## glance --tenant=admin--username=admin --password=hastexo  --auth_url=http://127.0.0.1:5000/v2.0 add name="Ubuntu 11.10 cloudimg amd64" is_public=true container_format=ovf disk_format=qcow2 < /root/precise-server-cloudimg-amd64-disk1.img
 ## 上传完镜像后。在运行
@@ -480,6 +488,7 @@ nova secgroup-add-rule default icmp -1 -1 0.0.0.0/0
 ## nova flavor-list
 ## 创建虚拟机
 # nova-manage flavor create --name=m1.minitest --memory=384 --cpu=1 --root_gb=1 --flavor=6 --ephemeral_gb=1
+glance add name="Ubuntu12.04-amd64" is_public=true container_format=ovf disk_format=qcow2 < precise-server-cloudimg-amd64-disk1.img
 nova boot --flavor 1 --image "Ubuntu12.04-amd64" --key_name key1 cloud01
 # nova show cloud01
 # nova console-log cloud01
@@ -508,15 +517,15 @@ nova show cloud01
 
 ## 八、完成安装部署
 cat <<EOF >&1
-## 1. login the dashboard
+ 1. login the dashboard
    http://192.168.139.50
    user:admin
    pass:ADMIN or $ADMIN_TOKEN
-## 2. login a instance("cloud01")
+ 2. login a instance("cloud01")
    ssh -i ~/.ssh/id_rsa ubuntu@10.0.0.2
-## 3. view & manage
+ 3. view & manage
    nova list
    nova show cloud01
    ...
-## 4. enjoy yourself!(Contact Hily.Hoo@gmail.com)
+ 4. enjoy yourself! (Contact Hily.Hoo@gmail.com)
 EOF

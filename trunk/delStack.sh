@@ -1,4 +1,10 @@
 #!/usr/bin/env bash
+# This script deletes three main OpenStack tools.
+# You can add others youself.
+
+# Hily.Hoo@gmail.com (Kayven)
+# Learn more and get the most recent version at http://code.google.com/p/onestack/
+
 set -o xtrace
 
 ## 
@@ -13,3 +19,6 @@ mysql -uroot -p$MYSQL_PASSWD -e "DROP DATABASE IF EXISTS nova;"
 mysql -uroot -p$MYSQL_PASSWD -e "DROP DATABASE IF EXISTS glance;"
 mysql -uroot -p$MYSQL_PASSWD -e "DROP DATABASE IF EXISTS keystone;"
 #apt-get update
+dpkg -l |grep keystone|awk '{print $2}'|xargs dpkg -P
+dpkg -l |grep glance|awk '{print $2}'|xargs dpkg -P
+dpkg -l |grep nova|awk '{print $2}'|xargs dpkg -P
