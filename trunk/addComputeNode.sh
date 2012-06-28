@@ -19,7 +19,6 @@ computeControlIP="192.168.139.150"
 ## token, 登录dashboard密码
 ADMIN_TOKEN="admin"
 
-
 ## network configure
 NETWORK_CONF=${NETWORK_CONF:-"/etc/network/interfaces"}
 cat <<INTERFACES >$NETWORK_CONF
@@ -134,6 +133,12 @@ sed -i -e "s/kvm/$VIRT_TYPE/g" /etc/nova/nova.conf
 sed -i -e "s/kvm/$VIRT_TYPE/g" /etc/nova/nova-compute.conf
 sed -i -e "s/192.168.139.51/$computeControlIP/g;" /etc/nova/nova.conf
 
+## 5：配置/etc/nova/api-paste.ini
+sed -i -e "
+       s/%SERVICE_TENANT_NAME%/admin/g;
+       s/%SERVICE_USER%/admin/g;
+       s/%SERVICE_PASSWORD%/$ADMIN_TOKEN/g;
+    " /etc/nova/api-paste.ini
 ## 重启服务
 service nova-compute restart
 
