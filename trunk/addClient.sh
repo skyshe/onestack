@@ -23,7 +23,7 @@ ADMIN_TOKEN="admin"
 
 ## 3、安装ntp
 apt-get install -y ntp
-echo $ServerControlIP > /etc/ntp.conf
+echo "server $ServerControlIP" > /etc/ntp.conf
 service ntp restart
 
 ## 4、安装nova
