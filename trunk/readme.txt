@@ -1,4 +1,3 @@
-
 ## 1. deploy OpenStack from scrach.
 Only checkout and run it! 
 1. Setup a fresh Ubuntu Precise(12.04) OS. 
@@ -12,9 +11,18 @@ cd onestack-read-only/ && ./oneStack.sh
 ## 2. delete OpenStack
 ./delStack.sh
 
-## 3. reset OpenStack
+## 3. delete all
+./delAll.sh
+
+## 4. reset OpenStack
 ./resetStack.sh clear
 ./resetStack.sh
 
-## 4. otherwise, contact me at Hily.Hoo@gmail.com, thanks.
+## 5. add OpenStack compute node
+./addComputeNode.sh
+
+## 6. add OpenStack client manage node
+./addClient.sh
+
+## 7. otherwise, contact me at Hily.Hoo@gmail.com, thanks.
 
