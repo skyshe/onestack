@@ -12,14 +12,10 @@ set -o xtrace
 
 ## 1、设置root权限
 ## 为了简单，全部都是用root来运行。
-if [ `whoami` != "root" ]; then
-        sudo passwd
-        exec su -c 'sh ./oneStack.sh'
-fi
 
 ##########################################################################
 ## 2、自行检查下面network/interfaces的两个网卡设置
-ServerControlIP ="192.168.139.50"
+ServerControlIP="192.168.139.50"
 
 ## token, 登录dashboard密码
 ADMIN_TOKEN="admin"
@@ -31,7 +27,7 @@ echo $ServerControlIP > /etc/ntp.conf
 service ntp restart
 
 ## 4、安装nova
-apt-get install python-novaclient glance-client swift qemu-kvm
+apt-get install -y python-novaclient glance-client swift qemu-kvm
 
 cat <<ENV_AUTH >> /etc/profile
 export OS_TENANT_NAME=admin
