@@ -1,8 +1,8 @@
-#!/usr/bin/env bash
-# **addComputeNode.sh** is a tool to add nova-compute node to OpenStack cloud computing service.
+#!/bin/bash
+## **addComputeNode.sh** is a tool to add nova-compute node to OpenStack cloud computing service.
 
-# Hily.Hoo@gmail.com (Kayven)
-# Learn more and get the most recent version at http://code.google.com/p/onestack/
+## Hily.Hoo@gmail.com (Kayven)
+## Learn more and get the most recent version at http://code.google.com/p/onestack/
 
 set -o xtrace
 ## 请使用root执行本脚本！
@@ -10,17 +10,11 @@ set -o xtrace
 ## 参考：
 ## http://docs.openstack.org/essex/openstack-compute/starter/content/
 
-## 1、设置root权限
-## 为了简单，全部都是用root来运行。
-if [ `whoami` != "root" ]; then
-        sudo passwd
-        exec su -c 'sh ./oneStack.sh'
-fi
 
 ##########################################################################
 ## 2、自行检查下面network/interfaces的两个网卡设置
-ServerControlIP ="192.168.139.50"
-computeControlIP ="192.168.139.51"
+ServerControlIP="192.168.139.50"
+computeControlIP="192.168.139.150"
 
 ## token, 登录dashboard密码
 ADMIN_TOKEN="admin"
@@ -28,15 +22,14 @@ ADMIN_TOKEN="admin"
 
 ## network configure
 NETWORK_CONF=${NETWORK_CONF:-"/etc/network/interfaces"}
-if ! grep -q eth1 $NETWORK_CONF; then
-        cat <<INTERFACES >$NETWORK_CONF
+cat <<INTERFACES >$NETWORK_CONF
 auto lo
 iface lo inet loopback
 
 # The primary network interface
 auto eth0
 iface eth0 inet static
-pre-up ifconfig eth0 hw ether b8:ac:6f:9a:ee:e4
+pre-up ifconfig eth0 hw ether b8:ac:6f:9a:ee:e5
         address 192.168.139.51
         netmask 255.255.255.0
         network 192.168.139.0
@@ -46,15 +39,14 @@ pre-up ifconfig eth0 hw ether b8:ac:6f:9a:ee:e4
 
 auto eth1
 iface eth1 inet static
-pre-up ifconfig eth1 hw ether b8:ac:6f:9a:ee:e4
+pre-up ifconfig eth1 hw ether b8:ac:6f:9a:ee:e5
         address 10.0.0.2
         netmask 255.255.255.0
         network 10.0.0.0
         broadcast 10.0.0.255
 INTERFACES
-        sed -i -e "s/192.168.139.51/$computeControlIP /g" $NETWORK_CONF
-        /etc/init.d/networking restart
-fi
+sed -i -e "s/192.168.139.51/$computeControlIP/g" $NETWORK_CONF
+/etc/init.d/networking restart
 
 ## 配置 /etc/nova/nova.conf，这里与控制节点的配置相同！比如ip是控制节点的ip
 MYSQL_PASSWD=${MYSQL_PASSWD:-"cloud1234"}
@@ -78,7 +70,7 @@ echo $ServerControlIP > /etc/ntp.conf
 service ntp restart
 
 ## 4、安装nova
-apt-get install nova-compute
+apt-get install -y nova-compute
 
 ## 配置 /etc/nova/nova.conf，这里与控制节点的配置相同！比如ip是控制节点的ip
 ## 如果你是在虚拟机里测试Openstack。你需要把默认的虚拟化引擎从kvm改成qemu。
@@ -142,7 +134,7 @@ sed -i -e "s/kvm/$VIRT_TYPE/g" /etc/nova/nova.conf
 sed -i -e "s/kvm/$VIRT_TYPE/g" /etc/nova/nova-compute.conf
 
 ## 重启服务
-service restart nova-compute
+service nova-compute restart
 
 ## command line:
 ##  nova-manage service list
