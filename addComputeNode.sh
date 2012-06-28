@@ -66,7 +66,7 @@ VIRT_TYPE="qemu"
 
 ## 3、安装bridge-utils、ntp
 apt-get install -y bridge-utils ntp
-echo $ServerControlIP > /etc/ntp.conf
+echo "server $ServerControlIP" > /etc/ntp.conf
 service ntp restart
 
 ## 4、安装nova
