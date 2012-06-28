@@ -105,8 +105,8 @@ cat <<NOVAconf > /etc/nova/nova.conf
 #novnc
 --novnc_enabled=true
 --novncproxy_base_url= http://192.168.139.50:6080/vnc_auto.html
---vncserver_proxyclient_address=127.0.0.1
---vncserver_listen=127.0.0.1
+--vncserver_proxyclient_address=192.168.139.51
+--vncserver_listen=192.168.139.51
 
 # network specific settings
 --network_manager=nova.network.manager.FlatDHCPManager
@@ -132,6 +132,7 @@ sed -i -e "s/10.0.0.1/$IN_IP/g;s/10.0.0.40/$FLAT_IP/g;s/10.0.0/$IN_IP_PRE/g;" /e
 ## kvm or qemu?
 sed -i -e "s/kvm/$VIRT_TYPE/g" /etc/nova/nova.conf
 sed -i -e "s/kvm/$VIRT_TYPE/g" /etc/nova/nova-compute.conf
+sed -i -e "s/192.168.139.51/$computeControlIP/g;" /etc/nova/nova.conf
 
 ## 重启服务
 service nova-compute restart
