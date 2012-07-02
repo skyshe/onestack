@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 # **setup_test.sh** is a tool to deploy test and real OpenStack cloud computing service.
 
-# This script installs and configures various combinations of *Glance*,
-# *Horizon*, *Keystone*, *Nova*, *Mysql* and others.
+# This script add an image and an instance to OpenStack for test.
 
 # Hily.Hoo@gmail.com (Kayven)
 # Learn more and get the most recent version at http://code.google.com/p/onestack/
@@ -13,8 +12,14 @@ set -o xtrace
 ## 参考：
 ## http://docs.openstack.org/essex/openstack-compute/starter/content/
 
+
+
+
 ## 一：部署基本系统
 ## ./setup_base.sh
+
+
+
 
 ## 二：下载镜像并上传
 ## ubuntu官方专门提供image，http://uec-images.ubuntu.com。不过一定要注意
@@ -25,8 +30,10 @@ set -o xtrace
 ## 1 这应该是ubuntu提供的最新的稳定的镜像。
 wget http://cloud-images.ubuntu.com/precise/current/precise-server-cloudimg-amd64-disk1.img
 
-## 2 
-## 3 如果scp
+## 2 如果本地镜像，放到本目录，名字改为precise-server-cloudimg-amd64-disk1.img，或者将下面镜像地址改为本地地址
+
+
+## 3 如果scp，使用下面的方法
 ##  expect -c "spawn /usr/bin/scp  yuan@192.168.139.84:/home/yuan/precise-server-cloudimg-amd64-disk1.img .; expect {
 ##     \"password:\"; {
 ##    send \"yyhu\r\n\";
@@ -36,10 +43,10 @@ wget http://cloud-images.ubuntu.com/precise/current/precise-server-cloudimg-amd6
 ##    send \"yyhu\r\n\";
 ##    }
 ##  } ; set timeout -1; expect -re \"100%\";"
-##^^####sleep 5; expect -re \"password\"; send \"yyhu\r\n\";
 
 
-## ：创建第一个VM，可以通过上面安装的web管理系统创建。
+
+## 三：创建第一个VM，可以通过上面安装的web管理系统创建。
 
 # 0：同步数据库
 ## 以前我运行同步数据库，如果正确, 当nova.conf
@@ -107,7 +114,10 @@ nova show cloud01
 ### 删除vm，vm的ID
 ### nova delete 10d1bc19-b2c4-4eee-a5c8-b256bda3f343
 
-## 八、完成安装部署
+
+
+
+## 四、完成安装部署
 cat <<EOF >&1
  1. login the dashboard
    http://192.168.139.50
