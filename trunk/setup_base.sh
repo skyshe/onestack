@@ -13,6 +13,11 @@ set -o xtrace
 ## 参考：
 ## http://docs.openstack.org/essex/openstack-compute/starter/content/
 
+## 本脚本建立基本的OpenStack系统，没有上传镜像，没有创建实例，使用 setup_test.sh可以完成这些。
+## 注意：如果没有设置apt源、网络等，请先设置，或者使用oneStack.sh安装（该脚本里面有详细说明）。
+
+
+
 ## 一：准备系统
 ## 1、设置参数
 ##########################################################################
