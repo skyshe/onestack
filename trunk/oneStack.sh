@@ -9,7 +9,7 @@
 
 set -o xtrace
 ## 请使用root执行本脚本！
-## Ubuntu 12.04 ("Precise") 部署 OpenStack Essex
+## Ubuntu 12.04 ("Precise") 部署 OpenStack Essex（或者ubuntu11.10版本）
 ## 参考：
 ## http://hi.baidu.com/chenshake/item/29a7b8c1b96fb82d46d5c0fb
 ## http://docs.openstack.org/essex/openstack-compute/starter/content/
@@ -28,30 +28,39 @@ if [ `whoami` != "root" ]; then
 	exec su -c 'sh ./oneStack.sh'
 fi
 
+## 4：设置参数和环境配置，直到两行#号结束
+## 这个配置以后就不需要更改了，比如看到192.168.139.50等ip，不用更改，脚本会自动替换这些初始值。
+## 可以变动的是，第500行的image的下载；或者去掉第七步开始的部分（上传镜像，创建实例）
+##########################################################################
 ##########################################################################
 ## 如果原来安装过OpenStack，请先执行 ./delStack.sh
-##########################################################################
-## 配置参数
+## 1）配置参数
+## 数据库相关
 MYSQL_PASSWD=${MYSQL_PASSWD:-"cloud1234"}
 NOVA_DB_USERNAME=${NOVA_DB_USERNAME:-"novadbadmin"}
 NOVA_DB_PASSWD=${NOVA_DB_PASSWD:-"cloud1234"}
 GLANCE_DB_USERNAME=${GLANCE_DB_USERNAME:-"glancedbadmin"}
 GLANCE_DB_PASSWD=${GLANCE_DB_PASSWD:-"cloud1234"}
 
+## 注意：单网卡的去掉interfaces的eth1，并把nova.conf里面eth1改完eth0即可！
 ## 自行检查下面network/interfaces的两个网卡设置
+## 本机器外网ip （包括局域网的内网ip，相对于OpenStack内网而言的）
 OUT_IP="192.168.139.50"
 OUT_IP_PRE="192.168.139"
+## nova-network内网ip
 IN_IP="10.0.0.1"
 IN_IP_PRE="10.0.0"
+## flat的起始ip
 FLAT_IP="10.0.0.40"
+## 浮动ip的起始值
 FLOAT_IP="192.168.139.225"
 
 ## 选择虚拟技术，裸机使用kvm，虚拟机里面使用qemu
 VIRT_TYPE="qemu"
-## token, 登录dashboard密码
+## token, 登录dashboard密码（用户名admin）
 ADMIN_TOKEN="admin"
 ##########################################################################
-
+## 2）检查系统是否ubuntu12.04，据反映11.10也可以正常安装，可以去掉这一段检查
 # Determine what system we are running on.  This provides ``os_VENDOR``...
 # Determine OS Vendor, Release and Update 
 #if [[ -x "`which lsb_release 2>/dev/null`" ]]; then
@@ -60,7 +69,6 @@ ADMIN_TOKEN="admin"
     os_UPDATE=""
     os_CODENAME=$(lsb_release -c -s)
 #fi
-
 if [ "Ubuntu" = "$os_VENDOR" ]; then
     DISTRO=$os_CODENAME
 else
@@ -74,8 +82,7 @@ if [ "precise" != ${DISTRO} -a "oneiric" != ${DISTRO} ]; then
 fi
 
 ############################################################################
-############################################################################
-## 以下系统配置，语言中文支持、国内APT源、网络设置（两个网卡），可以自行配置，注释掉这些步骤。
+## 3）以下系统配置，语言中文支持、国内APT源、网络设置（两个网卡），可以自行配置，注释掉这些步骤。
 ## locale
 cat <<EOF >/var/lib/locales/supported.d/local
 en_US.UTF-8 UTF-8
@@ -86,8 +93,7 @@ sed -i -e 's/zh_CN:UTF-8/en_US:UTF-8/g' /etc/default/locale
 sed -i -e 's/zh_CN:zh/en_US:en/g' /etc/default/locale
 dpkg-reconfigure locales
 locale-gen
-
-
+############################################################################
 ## 4：设置网络
 SOURCE_FILE=${SOURCE_FILE:-"/etc/apt/sources.list"}
 cp $SOURCE_FILE $SOURCE_FILE.bak
@@ -138,6 +144,8 @@ fi
 ############################################################################
 
 apt-get update
+
+
 
 ## 5：安装bridge
 apt-get install -y bridge-utils
@@ -338,7 +346,7 @@ service glance-api restart && service glance-registry restart
 ## 下载镜像
 ## http://cloud-images.ubuntu.com/precise/current/
 ## 这应该是ubuntu提供的最新的稳定的镜像。
-wget http://cloud-images.ubuntu.com/precise/current/precise-server-cloudimg-amd64-disk1.img
+#wget http://cloud-images.ubuntu.com/precise/current/precise-server-cloudimg-amd64-disk1.img
 ##  expect -c "spawn /usr/bin/scp  yuan@192.168.139.84:/home/yuan/precise-server-cloudimg-amd64-disk1.img .; expect {
 ##     \"password:\"; {
 ##    send \"yyhu\r\n\";
@@ -488,6 +496,9 @@ nova secgroup-add-rule default icmp -1 -1 0.0.0.0/0
 ## nova flavor-list
 ## 创建虚拟机
 # nova-manage flavor create --name=m1.minitest --memory=384 --cpu=1 --root_gb=1 --flavor=6 --ephemeral_gb=1
+
+## 上面的下载镜像移到这一步，可以去掉以下的步骤
+wget http://cloud-images.ubuntu.com/precise/current/precise-server-cloudimg-amd64-disk1.img
 glance add name="Ubuntu12.04-amd64" is_public=true container_format=ovf disk_format=qcow2 < precise-server-cloudimg-amd64-disk1.img
 nova boot --flavor 1 --image "Ubuntu12.04-amd64" --key_name key1 cloud01
 # nova show cloud01
@@ -520,7 +531,7 @@ cat <<EOF >&1
  1. login the dashboard
    http://192.168.139.50
    user:admin
-   pass:ADMIN or $ADMIN_TOKEN
+   pass:admin or $ADMIN_TOKEN
  2. login a instance("cloud01")
    ssh -i ~/.ssh/id_rsa ubuntu@10.0.0.2
  3. view & manage
