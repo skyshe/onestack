@@ -440,7 +440,11 @@ sed -i -e "
        s/%SERVICE_PASSWORD%/$ADMIN_TOKEN/g;
     " /etc/nova/api-paste.ini
 # 4：停止和重启nova相关服务
+## 更改卷组，否则启动nova-volume会出错。
+vgrename `hostname` nova-volumes
+
 for a in libvirt-bin nova-network nova-compute nova-api nova-objectstore nova-scheduler novnc nova-volume nova-consoleauth; do service "$a" restart; done
+
 
 
 ## 六：安装和配置Dashbaord
