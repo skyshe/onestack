@@ -374,6 +374,13 @@ sed -i -e "
        s/%SERVICE_PASSWORD%/$ADMIN_TOKEN/g;
     " /etc/nova/api-paste.ini
 # 4：停止和重启nova相关服务
+## 更改卷组，否则启动nova-volume会出错。
+vgrename `hostname` nova-volumes
+## 设置ipv4转发，否则外面能连接虚拟机，虚拟机访问不了外面
+sysctl -w net.ipv4.ip_forward=1
+##or:
+##echo 1 > /proc/sys/net/ipv4/ip_forward
+
 for a in libvirt-bin nova-network nova-compute nova-api nova-objectstore nova-scheduler novnc nova-volume nova-consoleauth; do service "$a" restart; done
 
 
