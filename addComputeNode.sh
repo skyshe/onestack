@@ -36,10 +36,14 @@ pre-up ifconfig eth0 hw ether b8:ac:6f:9a:ee:e5
         gateway 192.168.139.253
         dns-nameservers 210.72.128.8
 
-auto eth1
-iface eth1 inet static
-pre-up ifconfig eth1 hw ether b8:ac:6f:9a:ee:e5
-        address 10.0.0.2
+auto br100
+iface br100 inet static
+    bridge_ports    eth1
+    bridge_stp      off
+    bridge_maxwait  0
+    bridge_fd       0
+    pre-up ifconfig eth1 hw ether b8:ac:6f:9a:ee:e5
+        address 10.0.0.150
         netmask 255.255.255.0
         network 10.0.0.0
         broadcast 10.0.0.255
