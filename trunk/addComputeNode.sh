@@ -68,9 +68,10 @@ VIRT_TYPE="qemu"
 ##########################################################################
 
 ## 3、安装bridge-utils、ntp
-apt-get install -y bridge-utils ntp
+apt-get install -y bridge-utils ntp open-iscsi
 echo "server $ServerControlIP" > /etc/ntp.conf
 service ntp restart
+service open-iscsi start
 
 ## 4、安装nova
 apt-get install -y nova-compute
