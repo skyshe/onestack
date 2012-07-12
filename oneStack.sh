@@ -164,7 +164,8 @@ apt-get install -y tgt ssh w3m unzip wget curl expect
 ## 安装iscsi客户端、安装rabbitmq
 apt-get install -y open-iscsi open-iscsi-utils iscsitarget iscsitarget-dkms lvm2
 sed -i -e 's/false/true/' /etc/default/iscsitarget
-service iscsitarget restart
+service iscsitarget start
+/etc/init.d/open-iscsi restart
 apt-get install -y rabbitmq-server memcached python-memcache
 apt-get install -y kvm libvirt-bin qemu qemu-kvm
 
@@ -444,7 +445,7 @@ sed -i -e "
 # 4：停止和重启nova相关服务
 
 ## 更改卷组，否则启动nova-volume会出错。
-vgrename `hostname` nova-volumes
+#vgrename `hostname` nova-volumes
 ## 设置ipv4转发，否则外面能连接虚拟机，虚拟机访问不了外面
 sysctl -w net.ipv4.ip_forward=1
 ##or:
