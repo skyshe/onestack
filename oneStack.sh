@@ -162,9 +162,10 @@ service ntp restart
 ## 7：设置Iscsi
 apt-get install -y tgt ssh w3m unzip wget curl expect
 ## 安装iscsi客户端、安装rabbitmq
-apt-get install -y open-iscsi open-iscsi-utils iscsitarget iscsitarget-dkms lvm2
-sed -i -e 's/false/true/' /etc/default/iscsitarget
-service iscsitarget start
+apt-get install -y open-iscsi open-iscsi-utils lvm2
+##  iscsitarget iscsitarget-dkms
+## sed -i -e 's/false/true/' /etc/default/iscsitarget
+## service iscsitarget start
 /etc/init.d/open-iscsi restart
 apt-get install -y rabbitmq-server memcached python-memcache
 apt-get install -y kvm libvirt-bin qemu qemu-kvm
